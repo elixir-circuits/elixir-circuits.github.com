@@ -25,7 +25,7 @@
 
    <div class="section container content">
      <h2 class="header h2 text center">Libraries</h2>
-     <ul class="libraries">
+     <ul class="libraries flex-container">
        <li class="library">
          <div class="circle">
            <a class="text secondary library-name" href="https://github.com/elixir-circuits/circuits_gpio"><i class="far fa-lightbulb"></i></a>
@@ -52,9 +52,30 @@
         </li>
      </ul>
     </div>
+
+    <hr class="container">
+
+    <div class="container section content js-hex-query-component query-component">
+     <h2 class="header h2 text center">Search</h2>
+
+
+     <div class="flex-container library-search">
+      <a href="#" class="js-hex-circuits-library btn btn--big pill hover-active" data-name="circuits_gpio">GPIO</a>
+      <a href="#" class="js-hex-circuits-library btn pill btn--big hover-active" data-name="circuits_i2c">I2C</a>
+      <a href="#" class="js-hex-circuits-library btn pill btn--big hover-active" data-name="circuits_spi">SPI</a>
+      <a href="#" class="js-hex-circuits-library btn pill btn--big hover-active" data-name="circuits_uart">UART</a>
+     </div>
+
+      <div class="js-hex-search-avalibale-libraries avalibale-libraries-list"></div>
+    </div>
      <footer>
        <a class="icon" href="https://github.com/elixir-circuits"><i class="fab fa-github"></i></a>
      </footer>
+
     <a class="github-fork-ribbon" href="https://github.com/elixir-circuits" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="index.js"></script>
+
   </body>
 </html>
