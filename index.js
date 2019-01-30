@@ -2,7 +2,7 @@
 
 var hexSearch = {
   state: {
-    avaliableLibrariesDom: document.querySelector(".js-hex-search-avalibale-libraries"),
+    availableLibrariesDom: document.querySelector(".js-hex-search-available-libraries"),
     i2cLibraries: [],
     spiLibraries: [],
     gpioLibraries: [],
@@ -108,7 +108,7 @@ var hexSearch = {
       ul.appendChild(li);
     }
 
-    state.avaliableLibrariesDom.appendChild(ul);
+    state.availableLibrariesDom.appendChild(ul);
   },
 
   buildLibListItem: function (lib, protocol) {
