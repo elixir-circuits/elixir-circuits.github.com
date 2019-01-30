@@ -73,13 +73,6 @@ var hexSearch = {
     }
   },
 
-  attachLibraryClick: function (libraryDomElm, state) {
-    libraryDomElm.addEventListener("click", function (event) {
-      event.preventDefault();
-      this.update("search", [event.target, event.target.getAttribute("data-name")], state);
-    }.bind(this))
-  },
-
   search: function (libraryName) {
     return axios
     .get("https://hex.pm/api/packages?search=depends%3A" + libraryName)
@@ -113,12 +106,6 @@ var hexSearch = {
     for (var i = 0; i < state.nervesUartLibraries.length; i++) {
       var li = this.buildLibListItem(state.nervesUartLibraries[i], "nerves_uart");
       ul.appendChild(li);
-    }
-
-    var oldList = document.getElementById("js-hex-lib-list");
-
-    if (oldList) {
-      state.avaliableLibrariesDom.removeChild(oldList);
     }
 
     state.avaliableLibrariesDom.appendChild(ul);
