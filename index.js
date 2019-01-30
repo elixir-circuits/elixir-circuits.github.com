@@ -7,15 +7,16 @@ var hexSearch = {
     spiLibraries: [],
     gpioLibraries: [],
     uartLibraries: [],
+    nervesUartLibraries: [],
     selectedLibraries: [],
     lastSearch: null,
   },
 
   init: function () {
-    var libraries = ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi"];
+    var libraries = ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi", "nerves_uart"];
 
     for (var i = 0; i < libraries.length; i++) {
-      this.update("search", libraries[i], this.state); 
+      this.update("search", libraries[i], this.state);
     }
   },
 
@@ -49,6 +50,10 @@ var hexSearch = {
 
              if (libSearched === "circuits_uart") {
                state.uartLibraries.push(lib);
+             }
+
+             if (libSearched === "nerves_uart") {
+               state.nervesUartLibraries.push(lib);
              }
            }
 
@@ -105,12 +110,17 @@ var hexSearch = {
       ul.appendChild(li);
     }
 
+    for (var i = 0; i < state.nervesUartLibraries.length; i++) {
+      var li = this.buildLibListItem(state.nervesUartLibraries[i], "nerves_uart");
+      ul.appendChild(li);
+    }
+
     var oldList = document.getElementById("js-hex-lib-list");
 
     if (oldList) {
       state.avaliableLibrariesDom.removeChild(oldList);
     }
-   
+
     state.avaliableLibrariesDom.appendChild(ul);
   },
 
@@ -162,9 +172,12 @@ var hexSearch = {
       case "circuits_uart":
         return "uartLibraries";
         break;
+      case "nerves_uart":
+        return "nervesUartLibraries";
+        break;
     }
   },
-        
+
 }
 
 window.addEventListener("load", function (event) {
