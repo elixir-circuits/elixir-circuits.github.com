@@ -3,17 +3,19 @@
 var hexSearch = {
   state: {
     availableLibrariesDom: document.querySelector(".js-hex-search-available-libraries"),
+    aleLibrariesDom: document.querySelector(".js-elixir-ale-libraries"),
     i2cLibraries: [],
     spiLibraries: [],
     gpioLibraries: [],
     uartLibraries: [],
     nervesUartLibraries: [],
+    aleLibraries: [],
     selectedLibraries: [],
     lastSearch: null,
   },
 
   init: function () {
-    var libraries = ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi", "nerves_uart"];
+    var libraries = ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi", "nerves_uart", "elixir_ale"];
 
     for (var i = 0; i < libraries.length; i++) {
       this.update("search", libraries[i], this.state);
@@ -55,6 +57,10 @@ var hexSearch = {
              if (libSearched === "nerves_uart") {
                state.nervesUartLibraries.push(lib);
              }
+
+             if (libSearched === "elixir_ale") {
+               state.aleLibraries.push(lib);
+             }
            }
 
            this.update("updateDom", null, state);
@@ -83,6 +89,10 @@ var hexSearch = {
     ul.classList.add("flex-container");
     ul.id = "js-hex-lib-list";
 
+    var aleUl = document.createElement("ul");
+    aleUl.classList.add("flex-container");
+    aleUl.id = "js-hex-ale-list";
+
     for (var i = 0; i < state.i2cLibraries.length; i++) {
       var li = this.buildLibListItem(state.i2cLibraries[i], "circuits_i2c");
       ul.appendChild(li);
@@ -108,7 +118,13 @@ var hexSearch = {
       ul.appendChild(li);
     }
 
+    for (var i = 0; i < state.aleLibraries.length; i++) {
+      var li = this.buildLibListItem(state.aleLibraries[i], "elixir_ale");
+      aleUl.appendChild(li);
+    }
+
     state.availableLibrariesDom.appendChild(ul);
+    state.aleLibrariesDom.appendChild(aleUl);
   },
 
   buildLibListItem: function (lib, protocol) {
