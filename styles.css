@@ -176,7 +176,7 @@ ul {
 }
 
 .library-search-item {
-  margin-bottom: 25px;
+  margin: 25px;
 }
 
 .library-search-item .library-name {
@@ -195,8 +195,8 @@ ul {
 }
 
 .avalibale-libraries-list {
-  width: 50%;
   text-align: center;
+  padding: 15px;
 }
 
 footer {

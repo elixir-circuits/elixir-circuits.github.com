@@ -12,35 +12,21 @@ var hexSearch = {
   },
 
   init: function () {
-    console.log("Starting query eng");
+    var libraries = ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi"];
 
-    var jsQueryDom = document.querySelector(".js-hex-query-component");
-    var jsHexSearchlibraries = document.querySelectorAll(".js-hex-circuits-library");
-
-    for (var i = 0; i < jsHexSearchlibraries.length; i++) {
-      this.attachLibraryClick(jsHexSearchlibraries[i], this.state);
+    for (var i = 0; i < libraries.length; i++) {
+      this.update("search", libraries[i], this.state); 
     }
   },
 
   update: function(update_command, updateData, state) {
     switch (update_command) {
       case "search":
-        var elm = updateData[0];
-        var libQuery = updateData[1];
-
-        if (elm.classList.contains("active")) {
-          state[this.libNameToStateName(libQuery)] = [];
-          elm.classList.remove("active");
-          this.update("updateDom", null, state);
-        } else {
-          state.lastSearch = libQuery;
-          elm.classList.add("active");
-          this.update("search_response", this.search(libQuery), state);
-        }
-
+        this.update("search_response", [this.search(updateData), updateData], state);
         break;
       case "search_response":
-        updateData
+        var libSearched = updateData[1];
+        updateData[0]
          .then(function (response) {
            for (var i = 0; i < response.data.length; i++) {
              var lib = {
@@ -49,19 +35,19 @@ var hexSearch = {
                description: response.data[i].meta.description,
              };
 
-             if (state.lastSearch === "circuits_i2c") {
+             if (libSearched === "circuits_i2c") {
                state.i2cLibraries.push(lib);
              }
 
-             if (state.lastSearch === "circuits_gpio") {
+             if (libSearched === "circuits_gpio") {
                state.gpioLibraries.push(lib);
              }
 
-             if (state.lastSearch === "circuits_spi") {
+             if (libSearched === "circuits_spi") {
                state.gpioLibraries.push(lib);
              }
 
-             if (state.lastSearch === "circuits_uart") {
+             if (libSearched === "circuits_uart") {
                state.uartLibraries.push(lib);
              }
            }
@@ -96,6 +82,7 @@ var hexSearch = {
 
   updateDom: function(state) {
     var ul = document.createElement("ul");
+    ul.classList.add("flex-container");
     ul.id = "js-hex-lib-list";
 
     for (var i = 0; i < state.i2cLibraries.length; i++) {
