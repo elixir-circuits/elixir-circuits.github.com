@@ -142,7 +142,6 @@ ul {
 }
 
 .library {
-  height: 150px;
   width: 100%;
   margin-top: 25px;
 }
@@ -153,6 +152,7 @@ ul {
 
 .library .library-name {
   font-size: 3.5rem;
+  line-height: 150px;
 }
 
 .library a {
@@ -160,14 +160,13 @@ ul {
 }
 
 .library h3 {
-  line-height: 0;
+  text-align: center;
   margin-top: 15px;
   font-size: 2rem;
 }
 
 .library .circle {
   text-align: center;
-  line-height: 150px;
 }
 
 .library-search {
