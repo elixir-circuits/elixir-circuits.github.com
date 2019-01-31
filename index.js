@@ -4,6 +4,7 @@ var hexSearch = {
   state: {
     availableLibrariesDom: document.querySelector(".js-hex-search-available-libraries"),
     aleLibrariesDom: document.querySelector(".js-elixir-ale-libraries"),
+    searchedLibs: ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi", "nerves_uart", "elixir_ale"],
     i2cLibraries: [],
     spiLibraries: [],
     gpioLibraries: [],
@@ -15,52 +16,24 @@ var hexSearch = {
   },
 
   init: function () {
-    var libraries = ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi", "nerves_uart", "elixir_ale"];
-
-    for (var i = 0; i < libraries.length; i++) {
-      this.update("search", libraries[i], this.state);
-    }
+    this.update("search", null, this.state);
   },
 
   update: function(update_command, updateData, state) {
     switch (update_command) {
       case "search":
-        this.update("search_response", [this.search(updateData), updateData], state);
+        this.update("search_response", this.search(state), state);
         break;
       case "search_response":
-        var libSearched = updateData[1];
-        updateData[0]
-         .then(function (response) {
-           for (var i = 0; i < response.data.length; i++) {
-             var lib = {
-               name: response.data[i].name,
-               url: response.data[i].html_url,
-               description: response.data[i].meta.description,
-             };
+        updateData
+         .then(function (responses) {
+           // assumes that the keys to the reponse
+           // object is the same as the keys in
+           // our state model for the libraries
+           var libs = Object.keys(responses);
 
-             if (libSearched === "circuits_i2c") {
-               state.i2cLibraries.push(lib);
-             }
-
-             if (libSearched === "circuits_gpio") {
-               state.gpioLibraries.push(lib);
-             }
-
-             if (libSearched === "circuits_spi") {
-               state.gpioLibraries.push(lib);
-             }
-
-             if (libSearched === "circuits_uart") {
-               state.uartLibraries.push(lib);
-             }
-
-             if (libSearched === "nerves_uart") {
-               state.nervesUartLibraries.push(lib);
-             }
-
-             if (libSearched === "elixir_ale") {
-               state.aleLibraries.push(lib);
-             }
+           for (var i = 0; i < libs.length; i++) {
+             state[libs[i]] = responses[libs[i]];
            }
 
            this.update("updateDom", null, state);
@@ -79,9 +52,45 @@ var hexSearch = {
     }
   },
 
-  search: function (libraryName) {
+  search: function (state) {
+    var libReqs = [];
+
+    for (var i = 0; i < state.searchedLibs.length; i++) {
+      libReqs.push(this.searchLib(state.searchedLibs[i]));
+    }
+
+    return axios.all(libReqs)
+      .then(axios.spread(function (cuart, i2c, gpio, spi, nuart, ale) {
+        var responses = {
+          uartLibraries: this.libsFromResponse(cuart.data),
+          i2cLibraries: this.libsFromResponse(i2c.data),
+          gpioLibraries: this.libsFromResponse(gpio.data),
+          spiLibraries: this.libsFromResponse(spi.data),
+          nervesUartLibraries: this.libsFromResponse(nuart.data),
+          aleLibraries: this.libsFromResponse(ale.data),
+        };
+
+        return responses;
+      }.bind(this)).bind(this));
+  },
+
+  searchLib: function (libraryName) {
     return axios
     .get("https://hex.pm/api/packages?search=depends%3A" + libraryName)
+  },
+
+  libsFromResponse: function (responseData) {
+    var libs = [];
+
+    for (var i = 0; i < responseData.length; i++) {
+      libs.push({
+        name: responseData[i].name,
+        url: responseData[i].html_url,
+        description: responseData[i].meta.description,
+      });
+    }
+
+    return libs;
   },
 
   updateDom: function(state) {
