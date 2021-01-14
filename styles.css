@@ -198,6 +198,25 @@ ul {
   padding: 15px;
 }
 
+.search-table {
+    border: solid 1px #101010;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font: normal 13px Roboto, sans-serif;
+}
+.search-table thead th {
+    background-color: #101010;
+    border: solid 1px #101010;
+    color: #DCDCDC;
+    padding: 10px;
+    text-align: left;
+}
+.search-table tbody td {
+    border: solid 1px #DDEEEE;
+    color: #333;
+    padding: 10px;
+}
+
 footer {
   background-color: rgba(0,0,0,0.05);
   text-align: center;

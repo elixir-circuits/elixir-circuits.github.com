@@ -2,8 +2,8 @@
 
 var hexSearch = {
   state: {
-    availableLibrariesDom: document.querySelector(".js-hex-search-available-libraries"),
-    aleLibrariesDom: document.querySelector(".js-elixir-ale-libraries"),
+    availableLibrariesDom: document.querySelector(".js-hex-search-circuits-libs"),
+    aleLibrariesDom: document.querySelector(".js-hex-search-ale-libs"),
     searchedLibs: ["circuits_uart", "circuits_i2c", "circuits_gpio", "circuits_spi", "nerves_uart", "elixir_ale"],
     i2cLibraries: [],
     spiLibraries: [],
@@ -40,7 +40,7 @@ var hexSearch = {
          }.bind(this)
          )
         .catch(function (e) {
-          consoe.log(e);
+          console.log(e);
         });
         break;
 
@@ -76,7 +76,7 @@ var hexSearch = {
 
   searchLib: function (libraryName) {
     return axios
-    .get("https://hex.pm/api/packages?search=depends%3A" + libraryName)
+    .get("https://hex.pm/api/packages?search=depends%3A" + libraryName + "&sort=downloads")
   },
 
   libsFromResponse: function (responseData) {
@@ -87,6 +87,7 @@ var hexSearch = {
         name: responseData[i].name,
         url: responseData[i].html_url,
         description: responseData[i].meta.description,
+        downloads: responseData[i].downloads.all
       });
     }
 
@@ -94,62 +95,64 @@ var hexSearch = {
   },
 
   updateDom: function(state) {
-    var ul = document.createElement("ul");
-    ul.classList.add("flex-container");
-    ul.id = "js-hex-lib-list";
+    var container_circuits_i2c = this.updateDomSection(state.i2cLibraries, "circuits_i2c");
+    var container_circuits_gpio = this.updateDomSection(state.gpioLibraries, "circuits_gpio");
+    var container_circuits_spi = this.updateDomSection(state.spiLibraries, "circuits_spi");
+    var container_circuits_uart = this.updateDomSection(state.uartLibraries, "circuits_uart");
+    var container_nerves_uart = this.updateDomSection(state.nervesUartLibraries, "nerves_uart");
 
-    var aleUl = document.createElement("ul");
-    aleUl.classList.add("flex-container");
-    aleUl.id = "js-hex-ale-list";
+    var container_elixir_ale = this.updateDomSection(state.aleLibraries, "elixir_ale");
 
-    for (var i = 0; i < state.i2cLibraries.length; i++) {
-      var li = this.buildLibListItem(state.i2cLibraries[i], "circuits_i2c");
-      ul.appendChild(li);
-    }
+    state.availableLibrariesDom.innerHTML = container_circuits_i2c +
+	  container_circuits_gpio +
+	  container_circuits_spi +
+          container_circuits_uart +
+	  container_nerves_uart;
 
-    for (var i = 0; i < state.gpioLibraries.length; i++) {
-      var li = this.buildLibListItem(state.gpioLibraries[i], "circuits_gpio");
-      ul.appendChild(li);
-    }
-
-    for (var i = 0; i < state.spiLibraries.length; i++) {
-      var li = this.buildLibListItem(state.spiLibraries[i], "circuits_spi");
-      ul.appendChild(li);
-    }
-
-    for (var i = 0; i < state.uartLibraries.length; i++) {
-      var li = this.buildLibListItem(state.uartLibraries[i], "circuits_uart");
-      ul.appendChild(li);
-    }
-
-    for (var i = 0; i < state.nervesUartLibraries.length; i++) {
-      var li = this.buildLibListItem(state.nervesUartLibraries[i], "nerves_uart");
-      ul.appendChild(li);
-    }
-
-    for (var i = 0; i < state.aleLibraries.length; i++) {
-      var li = this.buildLibListItem(state.aleLibraries[i], "elixir_ale");
-      aleUl.appendChild(li);
-    }
-
-    state.availableLibrariesDom.appendChild(ul);
-    state.aleLibrariesDom.appendChild(aleUl);
+    state.aleLibrariesDom.innerHTML = container_elixir_ale;
   },
 
-  buildLibListItem: function (lib, protocol) {
-    var pName = this.aNode(lib.name, lib.url);
-    var protocol = this.pNode(protocol);
-    var description = this.pNode(lib.description);
-    var li = document.createElement("li");
-    li.className += " library-search-item";
-    pName.className += " library-name";
-    protocol.className += " protocol-name";
-    description.className += "library-description";
-    li.appendChild(pName);
-    li.appendChild(protocol);
-    li.appendChild(description);
+  updateDomSection: function(libs, protocol) {
+    var tbody = document.createElement("tbody");
 
-    return li;
+    for (var i = 0; i < libs.length; i++) {
+      var tr = this.buildLibTRItem(libs[i], protocol);
+      tbody.appendChild(tr);
+    }
+
+      const container_content =  `
+        <div class="container">
+           <h3 class="header h3 text center">${protocol}</h3>
+
+           <table class="search-table">
+              <thead>
+                <tr>
+                   <th>Name</th>
+                   <!-- <th>Protocol</th> -->
+                   <th>Downloads</th>
+                   <th>Description</th>
+                </tr>
+              <thead>
+              ${tbody.outerHTML}
+           </table>
+        </div>
+      `;
+
+     return container_content;
+  },
+
+  buildLibTRItem: function (lib, protocol) {
+    var pName = this.tdaNode(lib.name, lib.url);
+    var protocol = this.tdNode(protocol);
+    var downloads = this.tdNode(lib.downloads);
+    var description = this.tdNode(lib.description);
+    var tr = document.createElement("tr");
+    tr.appendChild(pName);
+    //tr.appendChild(protocol);
+    tr.appendChild(downloads);
+    tr.appendChild(description);
+
+    return tr;
   },
 
   pNode: function (txt) {
@@ -159,6 +162,26 @@ var hexSearch = {
 
     return p;
   },
+
+    tdNode:function (txt) {
+	var txtNode = document.createTextNode(txt);
+	var td = document.createElement("td");
+	td.appendChild(txtNode);
+	return td;
+    },
+
+    tdaNode:function (txt, link) {
+	var txtNode = document.createTextNode(txt);
+	var td = document.createElement("td");
+
+        var a = document.createElement("a");
+        a.appendChild(txtNode);
+        a.href = link;
+        a.target = "blank";
+
+	td.appendChild(a);
+	return td;
+    },
 
   aNode: function (txt, link) {
     var txtNode = document.createTextNode(txt);
