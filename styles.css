@@ -203,6 +203,7 @@ ul {
     border-collapse: collapse;
     border-spacing: 0;
     font: normal 13px Roboto, sans-serif;
+    width: 100%;
 }
 .search-table thead th {
     background-color: #101010;
